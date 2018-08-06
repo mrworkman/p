@@ -83,41 +83,41 @@ apply_theme() {
 
     # messages
     message_fg=colour16           # black
-    message_bg=colour11 # yellow
+    message_bg=colour220 # yellow
     message_attr=bold
     tmux set -g message-style fg=$message_fg,bg=$message_bg,$message_attr
 
     message_command_fg=colour16   # black
-    message_command_bg=colour160  # light yellow
+    message_command_bg=colour220  # light yellow
     tmux set -g message-command-style fg=$message_command_fg,bg=$message_command_bg,$message_attr
 
     # windows mode
-    mode_fg=colour16   # black
-    mode_bg=colour11 # yellow
+    mode_fg=colour232   # black
+    mode_bg=colour220 # yellow
     mode_attr=bold
     tmux setw -g mode-style fg=$mode_fg,bg=$mode_bg,$mode_attr
 
     # status line
-    status_fg=colour253 # white
-    status_bg=colour0 # dark gray
+    status_fg=colour7 # white
+    status_bg=colour255 # dark gray
     tmux set -g status-style fg=$status_fg,bg=$status_bg
 
-    session_fg=colour16  # black
-    session_bg=colour11 # yellow
+    session_fg=colour255  # black
+    session_bg=colour241 # yellow
     status_left="#[fg=$session_fg,bg=$session_bg,bold] ❐ #S #[fg=$session_bg,bg=$status_bg,nobold]$left_separator_black"
     if [ x"`tmux -q -L tmux_theme_status_left_test -f /dev/null new-session -d \; show -g -v status-left \; kill-session`" = x"[#S] " ] ; then
         status_left="$status_left "
     fi
     tmux set -g status-left-length 32 \; set -g status-left "$status_left"
 
-    window_status_fg=colour8 # gray
-    window_status_bg=colour0 # dark gray
-    window_status_format="#I #W"
+    window_status_fg=colour0 # gray
+    window_status_bg=colour10 # dark gray
+    window_status_format="#[fg=$status_bg]$left_separator_black#[fg=$window_status_fg] #I #W #[fg=$window_status_bg,bg=$status_bg]$left_separator_black"
     tmux setw -g window-status-style fg=$window_status_fg,bg=$window_status_bg \; setw -g window-status-format "$window_status_format"
 
-    window_status_current_fg=colour16 # black
-    window_status_current_bg=colour4 # blue
-    window_status_current_format="#[fg=$window_status_bg,bg=$window_status_current_bg]$left_separator_black#[fg=$window_status_current_fg,bg=$window_status_current_bg,bold] #I $left_separator #W #[fg=$window_status_current_bg,bg=$status_bg,nobold]$left_separator_black"
+    window_status_current_fg=colour0 # black
+    window_status_current_bg=colour12 # blue
+    window_status_current_format="#[fg=$status_bg,bg=$window_status_current_bg]$left_separator_black#[fg=$window_status_current_fg,bg=$window_status_current_bg,bold] #I $left_separator #W #[fg=$window_status_current_bg,bg=$status_bg,nobold]$left_separator_black"
     tmux setw -g window-status-current-format "$window_status_current_format"
     tmux set -g status-justify left
 
@@ -138,12 +138,12 @@ apply_theme() {
     battery_full_fg=colour160   # red
     battery_empty_fg=colour254  # white
     battery_bg=colour160        # black
-    time_date_fg=colour8      # gray
-    time_date_bg=colour0 # dark gray
+    time_date_fg=colour232      # gray
+    time_date_bg=colour232 # dark gray
     whoami_fg=colour254         # white
     whoami_bg=colour160         # red
     host_fg=colour16            # black
-    host_bg=colour254           # white
+    host_bg=colour250           # white
     status_right="︎#[fg=$time_date_fg,nobold]#{prefix_highlight} $right_separator %R $right_separator %a %d %b #[fg=$host_bg]"
 
     # Only show solid separator if CPU or Battery are to be displayed

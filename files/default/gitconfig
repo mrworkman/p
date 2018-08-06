@@ -1,0 +1,6 @@
+[alias]
+   gal  = log --graph --pretty=format':%C(bold yellow)%h%C(blue)%d%C(reset) %C(bold green)✦ %<|(100,trunc)%C(bold white)%s%C(reset) %C(dim white)%an, %C(reset)%C(dim red)%ar%Creset' --all
+   gas  = log --graph --pretty=format':%C(bold yellow)%h%C(blue)%d%C(reset) - %<|(100,trunc)%C(bold white)%s%C(reset) %C(dim white)%an, %C(reset)%C(dim red)%ar%Creset' --all --simplify-by-decoration
+
+[core]
+   excludesfile = /home/{user}/.gitignore_global

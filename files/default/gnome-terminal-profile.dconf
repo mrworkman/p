@@ -1,0 +1,24 @@
+[profiles:]
+list=['b1dcc9dd-5262-4d8d-a863-c897e6d979b9']
+default='b1dcc9dd-5262-4d8d-a863-c897e6d979b9'
+
+[profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+foreground-color='rgb(91,94,95)'
+encoding='UTF-8'
+visible-name='Steve'
+palette=['rgb(238,238,238)', 'rgb(204,0,0)', 'rgb(80,138,24)', 'rgb(234,120,12)', 'rgb(0,95,135)', 'rgb(117,80,123)', 'rgb(0,135,135)', 'rgb(46,52,54)', 'rgb(255,255,255)', 'rgb(239,41,41)', 'rgb(109,181,37)', 'rgb(255,132,18)', 'rgb(0,135,175)', 'rgb(173,127,168)', 'rgb(0,176,176)', 'rgb(115,130,135)']
+custom-command='tmux'
+use-system-font=false
+use-custom-command=true
+use-theme-colors=false
+font='FuraMono Nerd Font Regular 14'
+use-theme-transparency=false
+bold-color-same-as-fg=false
+bold-color='rgb(54,58,59)'
+background-color='rgb(238,238,238)'
+scrollbar-policy='never'
+scrollback-lines=2000000
+
+[/]
+schema-version=uint32 3
+default-show-menubar=false
