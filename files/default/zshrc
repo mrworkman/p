@@ -126,6 +126,11 @@ BULLETTRAIN_VIRTUALENV_PREFIX=
 
 BULLETTRAIN_STATUS_EXIT_SHOW=true
 
+BULLETTRAIN_GIT_PROMPT_CMD='$(printf " "; git rev-parse --abbrev-ref HEAD)'
+BULLETTRAIN_GIT_EXTENDED=false
+
+export DISPLAY=:0.0
+
 xssh() {
    ssh -C -R6000:localhost:6000 $*
 }
@@ -133,4 +138,3 @@ xssh() {
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export PATH=~/bin:~/opt/node/bin:~/.local/bin:$PATH
-

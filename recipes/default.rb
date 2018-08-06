@@ -70,6 +70,8 @@ packages.each do |package|
 
 end
 
+apt_package 'python3-distutils'
+
 # Install PIP for Python 3.6
 execute 'install-pip36' do
    command <<-EOF
@@ -148,10 +150,8 @@ end
 
 cookbook_file "/etc/vim/vimrc.local" do
    source 'vimrc.local'
-   owner   user
-   group   user
    mode   '0644'
-   action :nothing
+   action :create
 end
 
 cookbook_file "/home/#{user}/.vimrc" do
@@ -232,6 +232,18 @@ cookbook_file "/home/#{user}/.tmux.conf" do
    group   user
    mode   '0644'
    action :create
+end
+
+ruby 'update-bashrc' do
+   user  user
+   group user
+   interpreter 'bash'
+   code <<-EOH
+      grep 'export DISPLAY=' $HOME/.bashrc > /dev/null 2>&1
+      if [[ $? != 0 ]]; then
+         printf "\nexport DISPLAY=:0.0\n" >> $HOME/.bashrc
+      fi
+   EOH
 end
 
 git 'install-tmux-tpm' do
@@ -320,6 +332,6 @@ execute 'change-gnome-terminal-settings' do
    user  user
    group user
    command <<-EOF
-      dconf load /org/gnome/terminal/legacy/ < /tmp/gnome-terminal-profile.dconf
+      DISPLAY=:0.0 dconf load /org/gnome/terminal/legacy/ < /tmp/gnome-terminal-profile.dconf
    EOF
 end
