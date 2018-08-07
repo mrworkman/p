@@ -328,10 +328,10 @@ cookbook_file "/tmp/gnome-terminal-profile.dconf" do
    action :create
 end
 
+# Setting user/group on this one's not sufficient. Need to run
+# as a login session in order for dconf to connect.
 execute 'change-gnome-terminal-settings' do
-   user  user
-   group user
    command <<-EOF
-      DISPLAY=:0.0 dconf load /org/gnome/terminal/legacy/ < /tmp/gnome-terminal-profile.dconf
+      su -l -c "DISPLAY=:0.0 dconf load /org/gnome/terminal/legacy/ < /tmp/gnome-terminal-profile.dconf" #{user}
    EOF
 end
