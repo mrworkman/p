@@ -19,6 +19,8 @@ packages=[
    { :name => 'gnome-terminal', :sys => true, :wsl => true  },
    { :name => 'gtk-chtheme',    :sys => true, :wsl => true  },
    { :name => 'zsh',            :sys => true, :wsl => true  },
+   { :name => 'xdg-utils',      :sys => true, :wsl => true  },
+   { :name => 'xsel',           :sys => true, :wsl => true  },
    { :name => 'tmux',           :sys => true, :wsl => true  },
    { :name => 'python',         :sys => true, :wsl => true  },
    { :name => 'python-pip',     :sys => true, :wsl => true  },
@@ -45,6 +47,7 @@ if user == 'root'
    end
 end
 
+# FIXME: This doesn't work on Ubuntu 16.04, it's only needed for 18.04.
 pip_binary = '/usr/local/bin/pip3.6'
 
 apt_repository 'deadsnakes-python' do
