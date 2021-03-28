@@ -1,5 +1,256 @@
 #!/bin/bash
 
-# berks install
-# berks vendor ..
-sudo chef-client --local-mode -c client.rb -j node.json $*
+repo_dir="__prepo_"
+script_dir=$(dirname $(realpath "$0"))
+
+wsl=false
+distro=UNKNOWN
+distro_release=UNKNOWN
+
+user=$(whoami)
+user_dir=$(eval "echo ~$user")
+
+if [[ $user == "root" ]]; then
+   tput setaf 1
+   printf -- "--ERROR-> Do not run this script as root.\n"
+   printf -- "--ERROR-> Exiting!\n\n"
+   tput sgr0
+   exit
+fi
+
+function determine_distro {
+   if [[ $WSL_DISTRO_NAME != "" || "$(uname -r)" =~ icrosoft ]]; then
+      wsl=true 
+   fi
+
+   if [[ -e /etc/redhat-release ]]; then
+      distro=redhat
+      return
+   fi
+
+   if [[ -e /etc/lsb-release ]]; then
+
+      printf "Updating package cache...\n"
+      sudo apt-get update > /dev/null
+
+      printf "Installing prerequisites...\n"
+      install_package lsb-release true true
+
+      distro=$(lsb_release -si | tr A-Z a-z)
+      distro_release=$(lsb_release -sr)
+
+      return
+   fi
+}
+
+function print_result_or_die {
+   o="$1"
+   r=$2
+
+   if [[ $r -ne 0 ]]; then
+      formatted=$(printf "$o" | awk '{ x=gensub("^", "--ERROR-> ", "G"); printf x "\n" }')
+
+      printf " ❌\n"
+
+      tput setaf 1
+      printf -- "--ERROR-> Error encountered!\n"
+      printf -- "$formatted\n"
+      printf -- "--ERROR-> Exiting!\n\n"
+      tput sgr0
+
+      exit $r
+   else
+      printf " ✔️\n"
+   fi
+}
+
+function install_package_dist {
+   package="$1"
+
+   printf "Installing '$package'..."
+
+   case $distro in
+      ubuntu)
+         o=$(sudo apt-get install -y "$package" 2>&1 > /dev/null)
+         r=$?
+         ;;
+      redhat)
+         o=$(sudo yum install -y "X$package")
+         r=$?
+         ;;
+      *) ;;
+   esac > /dev/null
+
+   print_result_or_die "$o" $r
+}
+
+function remove_package_dist {
+   package="$1"
+
+   printf "Removing   '$package'..."
+
+   case $distro in
+      ubuntu)
+         o=$(sudo apt-get remove -y "$package" 2>&1 > /dev/null)
+         r=$?
+         ;;
+      redhat)
+         o=$(sudo yum remove -y "$package" 2>&1 > /dev/null)
+         r=$?
+         ;;
+      *) ;;
+   esac
+
+   print_result_or_die "$o" $r
+}
+
+function install_package {
+   package="$1"
+   
+   # What we do depends on whether we're on WSL.
+   case $wsl in
+      false) install=$2
+         ;;
+      *) install=$3
+         ;;
+   esac
+   
+   # Install or remove package based on $install flag.
+   case $install in
+      true) install_package_dist $package
+         ;;
+      *) remove_package_dist $package
+         ;;
+   esac
+}
+
+function install_pip27 {
+   [[ -e /usr/local/bin/pip2 ]] && return
+
+   printf "Installing pip for python2..."
+   o=$(sudo curl -s https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python2 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
+}
+
+function install_pip3 {
+   [[ -e /usr/local/bin/pip3 ]] && return
+
+   printf "Installing pip for python3..."
+   o=$(sudo curl -s https://bootstrap.pypa.io/get-pip.py | sudo python3 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
+}
+
+function install_file {
+   source="$1"
+   target="$2"
+   mode="${3:+-m $3}"
+   owner="${4:+-o $4}"
+   group="${5:+-g $5}"
+
+   printf "Installing file '$(basename $source)'..."
+   o=$(sudo install -v $mode $owner $group "$source" "$target" 2>&1)
+   r=$?
+   print_result_or_die "$o" $r
+}
+
+function clean_up {
+   sudo apt-get -y autoremove > /dev/null
+}
+
+
+printf "Starting...\n"
+
+# Make sure we're in the same directory as the script.
+pushd $script_dir > /dev/null
+
+determine_distro
+
+printf "\n"
+printf "==========================\n"
+printf "System Info\n"
+printf -- "------------\n"
+printf "User:    $user\n"
+printf "WSL:     $wsl\n"
+printf "Distro:  $distro\n"
+printf "Release: $distro_release\n"
+printf "==========================\n"
+printf "\n"
+
+if [[ $distro != "ubuntu" ]]; then
+   printf "Unsupported distro! 😟\n\n"
+   exit 1
+fi >&2
+
+# #               package name   | dist |  wsl |
+# install_package 'coreutils'      true   true
+# install_package 'zsh'            true   true
+# install_package 'nano'           false  false
+# install_package 'vim-nox'        true   true
+# install_package 'git'            true   true
+# install_package 'unity'          true   false
+# install_package 'gnome-terminal' true   false
+# install_package 'xsel'           true   true
+# install_package 'tmux'           true   true
+
+# if [[ $distro == "ubuntu" ]]; then
+
+#    case "$distro_release" in
+#       18*)
+#          install_package 'python'            true   true
+#          install_package 'python-pip'        true   true
+#          ;;
+#       20*)
+#          install_package 'python-is-python2' true   true
+#          install_pip27
+#          ;;
+#    esac
+
+# fi
+
+# install_package 'python3'           true   true
+# install_package 'python3-venv'      true   true
+# install_package 'python3-distutils' true   true
+# install_pip3
+
+# install_package 'gcc'               true   true
+# install_package 'make'              true   true
+# install_package 'automake'          true   true
+# install_package 'openssh-server'    true   false
+
+# install_package 'libreoffice'       false  false
+# install_package 'firefox'           true   false
+# install_package 'gtk-chtheme'       true   false
+# install_package 'xdg-utils'         true   false
+# install_package 'xrdp'              true   false
+# install_package 'xorgxrdp'          true   false
+
+clean_up -y
+
+printf "\n"
+
+# Clone the repo, if we're not running from a local script.
+if [[ ! -e .git &&  ! -e .p_repo ]]; then
+   cloned=true
+   
+   printf "Cloning repo..."
+
+   o=$(rm -Rf $repo_dir 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
+
+   o=$(git clone https://github.com/mrworkman/p.git $repo_dir 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
+
+   pushd $repo_dir > /dev/null
+fi
+
+install_file files/.selected_editor $HOME 660
+
+# Return to the directory the caller was in.
+[[ $cloned ]] && popd > /dev/null
+popd > /dev/null
+
+printf "Done!\n"
