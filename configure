@@ -382,6 +382,11 @@ for pair in $user:$group:$user_dir root:root:/root; do
    install_file files/.vimrc           $ud             0644 $u $g
    install_file files/.gitconfig       $ud             0644 $u $g
    install_file files/PaperColor.vim   $ud/.vim/colors 0644 $u $g
+
+   printf "Changing $u's default shell to zsh..."
+   o=$(sudo -H chsh -s /usr/bin/zsh $u 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
 done
 
 install_file files/vimrc.local /etc/vim 0644 root root
