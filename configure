@@ -211,10 +211,10 @@ function configure_tmux {
          print_result_or_die "$o" $r
       fi
 
-      printf "Installing tmux plugins for user '$u'..."
-      o=$(sudo -Hu $u bash -c "$tmux_dir/bin/install_plugins" 2>&1 > /dev/null)
-      r=$?
-      print_result_or_die "$o" $r
+      # printf "Installing tmux plugins for user '$u'..."
+      # o=$(sudo -Hu $u bash -c "$tmux_dir/bin/install_plugins" 2>&1 > /dev/null)
+      # r=$?
+      # print_result_or_die "$o" $r
 
       install_file files/.tmux.conf  $user_dir                      0644 $u $g
       install_file files/maglev.tmux $user_dir/.tmux/plugins/maglev 0744 $u $g
