@@ -4,3 +4,7 @@
 
 [core]
    excludesfile = /home/{user}/.gitignore_global
+
+[user]
+   name = Stephen Workman
+   email = workman.stephen@gmail.com

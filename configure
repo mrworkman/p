@@ -7,7 +7,8 @@ wsl=false
 distro=UNKNOWN
 distro_release=UNKNOWN
 
-user=$(whoami)
+user=$(id -nu)
+group=$(id -ng)
 user_dir=$(eval "echo ~$user")
 
 if [[ $user == "root" ]]; then
@@ -44,8 +45,8 @@ function determine_distro {
 }
 
 function print_result_or_die {
-   o="$1"
-   r=$2
+   local o="$1"
+   local r=$2
 
    if [[ $r -ne 0 ]]; then
       formatted=$(printf "$o" | awk '{ x=gensub("^", "--ERROR-> ", "G"); printf x "\n" }')
@@ -124,11 +125,31 @@ function install_package {
    esac
 }
 
+function install_python2_package {
+   package="$1"
+
+   printf "Installing Python 2 '$package'..."
+   o=$(sudo /usr/local/bin/pip2 install "$package" 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
+}
+
+function install_python3_package {
+   package="$1"
+
+   printf "Installing Python 3 '$package'..."
+   o=$(sudo /usr/local/bin/pip3 install "$package" 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
+}
+
 function install_pip27 {
    [[ -e /usr/local/bin/pip2 ]] && return
 
+   # NB: WSL2 does not currently support IPv6, so curl must explicitly use `-4`.
+
    printf "Installing pip for python2..."
-   o=$(sudo curl -s https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python2 2>&1 > /dev/null)
+   o=$(sudo curl -s4 https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python2 2>&1 > /dev/null)
    r=$?
    print_result_or_die "$o" $r
 }
@@ -136,29 +157,119 @@ function install_pip27 {
 function install_pip3 {
    [[ -e /usr/local/bin/pip3 ]] && return
 
+   # NB: WSL2 does not currently support IPv6, so curl must explicitly use `-4`.
+
    printf "Installing pip for python3..."
-   o=$(sudo curl -s https://bootstrap.pypa.io/get-pip.py | sudo python3 2>&1 > /dev/null)
+   o=$(sudo curl -s4 https://bootstrap.pypa.io/get-pip.py | sudo python3 2>&1 > /dev/null)
+   r=$?
+   print_result_or_die "$o" $r
+}
+
+function install_dir {
+   local target="$1"
+   local mode="${2:+-m $2}"
+
+   local user=${3:-$user}
+   local owner="-o ${3:-$user}"
+   local group="-g ${4:-$group}"
+
+   printf "Installing directory '$target'..."
+   o=$(sudo install -v $mode $owner $group -d "$target" 2>&1)
    r=$?
    print_result_or_die "$o" $r
 }
 
 function install_file {
-   source="$1"
-   target="$2"
-   mode="${3:+-m $3}"
-   owner="${4:+-o $4}"
-   group="${5:+-g $5}"
+   local source="$1"
+   local target="$2"
+   local mode="${3:+-m $3}"
+   
+   local user=${4:-$user}
+   local owner="-o ${4:-$user}"
+   local group="-g ${5:-$group}"
 
-   printf "Installing file '$(basename $source)'..."
+   printf "Installing file '$(basename $source)' for user '$user'..."
    o=$(sudo install -v $mode $owner $group "$source" "$target" 2>&1)
    r=$?
    print_result_or_die "$o" $r
 }
 
+function configure_tmux {
+   local u=
+   local install_source="https://github.com/tmux-plugins/tpm.git"
+
+   for u in $user root; do
+      local user_dir="$(eval "echo ~$u")"
+      local tmux_dir="$user_dir/.tmux/plugins/tpm"
+
+      local exists=$(sudo -H -u $u bash -c "[[ -e $tmux_dir ]]; echo \$?")
+
+      if [[ $exists -ne 0 ]]; then
+         printf "Fetching tmux plugins for user '$u'..."
+         o=$(sudo -Hu $u bash -c "git clone $install_source $tmux_dir" 2>&1 > /dev/null)
+         r=$?
+         print_result_or_die "$o" $r
+      fi
+
+      printf "Installing tmux plugins for user '$u'..."
+      o=$(sudo -Hu $u bash -c "$tmux_dir/bin/install_plugins" 2>&1 > /dev/null)
+      r=$?
+      print_result_or_die "$o" $r
+
+      install_file files/.tmux.conf  $user_dir                      0644 $u $g
+      install_file files/maglev.tmux $user_dir/.tmux/plugins/maglev 0744 $u $g
+   done
+}
+
+function configure_ssh {
+   
+   if [[ ! -e $user_dir/.ssh/id_rsa ]]; then
+      printf "Creating default SSH key for '$user'..."
+      o=$(ssh-keygen -t rsa -b 8192 -f $user_dir/.ssh/id_rsa -N '' 2>&1 > /dev/null)
+      r=$?
+      print_result_or_die "$o" $r
+   else
+      printf "Default SSH key exists for '$user'.\n"
+   fi
+
+   if [[ ! -e $user_dir/.ssh/id_rsa_gh ]]; then
+      printf "Creating GitHub SSH key for '$user'..."
+      o=$(ssh-keygen -t rsa -b 8192 -f $user_dir/.ssh/id_rsa_gh -N '' 2>&1 > /dev/null)
+      r=$?
+      print_result_or_die "$o" $r
+   else
+      printf "GitHub SSH key exists for '$user'.\n"
+   fi
+
+   install_file files/ssh-config $user_dir/.ssh/config 0600
+}
+
+function configure_zsh {
+   local u=
+   local install_source="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
+
+   for u in $user root; do
+      local user_dir="$(eval "echo ~$u")"
+      local omzsh_dir="$user_dir/.oh-my-zsh"
+
+      printf "Removing existing '$omzsh_dir'..."
+      o=$(sudo -Hu $u bash -c "rm -Rf $omzsh_dir" 2>&1 > /dev/null)
+      r=$?
+      print_result_or_die "$o" $r
+
+      printf "Installing oh-my-zsh for user '$u'..."
+      o=$(sudo -Hu $u bash -c "curl -fsSL4 $install_source | sh" 2>&1 > /dev/null)
+      r=$?
+      print_result_or_die "$o" $r
+
+      install_file files/bullet-train.zsh-theme $omzsh_dir/themes/ 0644 $u $g
+      install_file files/.zshrc $user_dir                          0644 $u $g
+   done
+}
+
 function clean_up {
    sudo apt-get -y autoremove > /dev/null
 }
-
 
 printf "Starting...\n"
 
@@ -183,48 +294,48 @@ if [[ $distro != "ubuntu" ]]; then
    exit 1
 fi >&2
 
-# #               package name   | dist |  wsl |
-# install_package 'coreutils'      true   true
-# install_package 'zsh'            true   true
-# install_package 'nano'           false  false
-# install_package 'vim-nox'        true   true
-# install_package 'git'            true   true
-# install_package 'unity'          true   false
-# install_package 'gnome-terminal' true   false
-# install_package 'xsel'           true   true
-# install_package 'tmux'           true   true
+#               package name   | dist |  wsl |
+install_package 'coreutils'      true   true
+install_package 'zsh'            true   true
+install_package 'nano'           false  false
+install_package 'vim-nox'        true   true
+install_package 'git'            true   true
+install_package 'unity'          true   false
+install_package 'gnome-terminal' true   false
+install_package 'xsel'           true   true
+install_package 'tmux'           true   true
 
-# if [[ $distro == "ubuntu" ]]; then
+if [[ $distro == "ubuntu" ]]; then
 
-#    case "$distro_release" in
-#       18*)
-#          install_package 'python'            true   true
-#          install_package 'python-pip'        true   true
-#          ;;
-#       20*)
-#          install_package 'python-is-python2' true   true
-#          install_pip27
-#          ;;
-#    esac
+   case "$distro_release" in
+      18*)
+         install_package 'python'            true   true
+         install_package 'python-pip'        true   true
+         ;;
+      20*)
+         install_package 'python-is-python2' true   true
+         install_pip27
+         ;;
+   esac
 
-# fi
+fi
 
-# install_package 'python3'           true   true
-# install_package 'python3-venv'      true   true
-# install_package 'python3-distutils' true   true
-# install_pip3
+install_package 'python3'           true   true
+install_package 'python3-venv'      true   true
+install_package 'python3-distutils' true   true
+install_pip3
 
-# install_package 'gcc'               true   true
-# install_package 'make'              true   true
-# install_package 'automake'          true   true
-# install_package 'openssh-server'    true   false
+install_package 'gcc'               true   true
+install_package 'make'              true   true
+install_package 'automake'          true   true
+install_package 'openssh-server'    true   false
 
-# install_package 'libreoffice'       false  false
-# install_package 'firefox'           true   false
-# install_package 'gtk-chtheme'       true   false
-# install_package 'xdg-utils'         true   false
-# install_package 'xrdp'              true   false
-# install_package 'xorgxrdp'          true   false
+install_package 'libreoffice'       false  false
+install_package 'firefox'           true   false
+install_package 'gtk-chtheme'       true   false
+install_package 'xdg-utils'         true   true  # needed for tmux
+install_package 'xrdp'              true   false
+install_package 'xorgxrdp'          true   false
 
 clean_up -y
 
@@ -247,10 +358,60 @@ if [[ ! -e .git &&  ! -e .p_repo ]]; then
    pushd $repo_dir > /dev/null
 fi
 
-install_file files/.selected_editor $HOME 660
+dirs=(
+   .local              
+   .local/share        
+   .local/share/fonts  
+   .vim                
+   .vim/colors          
+   .tmux               
+   .tmux/plugins       
+   .tmux/plugins/maglev
+)
+
+for pair in $user:$group:$user_dir root:root:/root; do
+   IFS=: read u g ud <<.
+   $pair
+.
+
+   for dir in ${dirs[*]}; do
+      install_dir $ud/$dir 0755 $u $g
+   done
+
+   install_file files/.selected_editor $ud             0644 $u $g
+   install_file files/.vimrc           $ud             0644 $u $g
+   install_file files/.gitconfig       $ud             0644 $u $g
+   install_file files/PaperColor.vim   $ud/.vim/colors 0644 $u $g
+done
+
+install_file files/vimrc.local /etc/vim 0644 root root
+
+printf "\n"
+
+install_python2_package powerline-status
+
+configure_zsh
+configure_tmux
+configure_ssh
+
+if [[ ! $wsl ]]; then
+   install_file files/.fonts.conf                  $user_dir 0644
+   install_file files/gnome-terminal-profile.dconf /tmp      0644
+
+   printf "Loading gnome-terminal profile..."
+   o=$(sudo bash -lc "DISPLAY=:0.0 dconf load /org/gnome/terminal/legacy/ < /tmp/gnome-terminal-profile.dconf" $user 2>&1)
+   r=$?
+   print_result_or_die "$o" $r
+fi
 
 # Return to the directory the caller was in.
 [[ $cloned ]] && popd > /dev/null
 popd > /dev/null
+
+tput setaf 3
+printf "\n"
+printf "Start tmux and hit ctrl+b shift+i to initialize plugins and maglev.\n"
+printf "\n"
+tput sgr0
 
 printf "Done!\n"
