@@ -126,6 +126,8 @@ BULLETTRAIN_VIRTUALENV_PREFIX=
 
 BULLETTRAIN_STATUS_EXIT_SHOW=true
 
+BULLETTRAIN_DIR_EXTENDED=0
+BULLETTRAIN_CONTEXT_HOSTNAME=
 BULLETTRAIN_GIT_PROMPT_CMD='$(printf " "; git rev-parse --abbrev-ref HEAD)'
 BULLETTRAIN_GIT_EXTENDED=false
 
@@ -136,5 +138,36 @@ xssh() {
 }
 
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-export PATH=~/bin:~/opt/node/bin:~/.local/bin:$PATH
+alias wgit='/mnt/c/Program\ Files/Git/bin/git.exe'
+
+function git {
+   case $PWD in
+      /mnt/c/*)
+         ;&
+      /mnt/d/*)
+         wgit "$@"
+         ;;
+      *)
+         command git "$@"
+         ;;
+   esac
+}
+
+function gradlew {
+   local cmd='/mnt/c/WINDOWS/system32/cmd.exe'
+
+   case $PWD in
+      /mnt/c/*)
+         ;&
+      /mnt/d/*)
+         $cmd /c gradlew.bat "$@"
+         ;;
+      *)
+         if [[ -e $PWD/gradlew ]]; then
+             $PWD/gradlew "$@"
+         else
+            command gradlew "$@"
+         fi
+         ;;
+   esac
+}

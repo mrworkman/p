@@ -229,7 +229,7 @@ if [ ! -n "${BULLETTRAIN_CONTEXT_FG+1}" ]; then
   BULLETTRAIN_CONTEXT_FG=default
 fi
 if [ ! -n "${BULLETTRAIN_CONTEXT_HOSTNAME+1}" ]; then
-  BULLETTRAIN_CONTEXT_HOSTNAME=%m
+  BULLETTRAIN_CONTEXT_HOSTNAME=@%m
 fi
 
 # GIT PROMPT
@@ -334,11 +334,12 @@ SEGMENT_SEPARATOR=''
 # Takes three arguments, background, foreground and text. All of them can be omitted,
 # rendering default background/foreground and no text.
 prompt_segment() {
-  local bg fg
+  local bg fg pad
   [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
   [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
+  [[ -n $4 ]] && pad="$4" || pad=" "
   if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
-    echo -n " %{$bg%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR%{$fg%} "
+    echo -n " %{$bg%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR%{$fg%}$pad"
   else
     echo -n "%{$bg%}%{$fg%} "
   fi
@@ -366,7 +367,7 @@ prompt_end() {
 # Context: user@hostname (who am I and where am I)
 context() {
   local user="$(whoami)"
-  [[ "$user" != "$BULLETTRAIN_CONTEXT_DEFAULT_USER" || -n "$BULLETTRAIN_IS_SSH_CLIENT" ]] && echo -n "${user}@$BULLETTRAIN_CONTEXT_HOSTNAME"
+  [[ "$user" != "$BULLETTRAIN_CONTEXT_DEFAULT_USER" || -n "$BULLETTRAIN_IS_SSH_CLIENT" ]] && echo -n "${user}$BULLETTRAIN_CONTEXT_HOSTNAME"
 }
 
 prompt_context() {
@@ -478,6 +479,7 @@ prompt_hg() {
 prompt_dir() {
   local dir=''
   local _context="$(context)"
+
   [[ $BULLETTRAIN_DIR_CONTEXT_SHOW == true && -n "$_context" ]] && dir="${dir}${_context}:"
 
   if [[ $BULLETTRAIN_DIR_EXTENDED == 0 ]]; then
@@ -491,7 +493,12 @@ prompt_dir() {
     dir="${dir}%4(c:...:)%3c"
   fi
 
-  prompt_segment $BULLETTRAIN_DIR_BG $BULLETTRAIN_DIR_FG $dir
+  # Show a Windows logo if it looks like we're using a WSL mounted directory.
+  if [[ $PWD =~ ^/mnt/[c-z]/ || $PWD =~ ^/mnt/[c-z]$ ]]; then
+    dir="者 ${dir}"
+  fi
+
+  prompt_segment $BULLETTRAIN_DIR_BG $BULLETTRAIN_DIR_FG $dir "\u200A" # "Hair space"
 }
 
 # RUBY
@@ -621,7 +628,7 @@ prompt_status() {
   symbols=()
   [[ $RETVAL -ne 0 && $BULLETTRAIN_STATUS_EXIT_SHOW != true ]] && symbols+="✘"
   [[ $RETVAL -ne 0 && $BULLETTRAIN_STATUS_EXIT_SHOW == true ]] && symbols+="✘ $RETVAL"
-  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡%f"
+  [[ $UID -eq 0 ]] && symbols+="%{%F{black}%}%f"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="⚙"
 
   if [[ -n "$symbols" && $RETVAL -ne 0 ]]; then
