@@ -493,8 +493,10 @@ prompt_dir() {
     dir="${dir}%4(c:...:)%3c"
   fi
 
+  rwd=$(realpath $(pwd))
+
   # Show a Windows logo if it looks like we're using a WSL mounted directory.
-  if [[ $PWD =~ ^/mnt/[c-z]/ || $PWD =~ ^/mnt/[c-z]$ ]]; then
+  if [[ $rwd =~ ^/mnt/[c-z]/ || $rwd =~ ^/mnt/[c-z]$ ]]; then
     dir="者 ${dir}"
   fi
 
