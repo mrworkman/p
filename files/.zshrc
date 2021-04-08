@@ -141,7 +141,9 @@ xssh() {
 alias wgit='/mnt/c/Program\ Files/Git/bin/git.exe'
 
 function git {
-   case $PWD in
+   local rwd="$(realpath "$(pwd)")"
+
+   case $rwd in
       /mnt/c/*)
          ;&
       /mnt/d/*)
@@ -155,8 +157,9 @@ function git {
 
 function gradlew {
    local cmd='/mnt/c/WINDOWS/system32/cmd.exe'
+   local rwd="$(realpath "$(pwd)")"
 
-   case $PWD in
+   case $rwd in
       /mnt/c/*)
          ;&
       /mnt/d/*)
@@ -171,3 +174,4 @@ function gradlew {
          ;;
    esac
 }
+
