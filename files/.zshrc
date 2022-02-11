@@ -51,7 +51,12 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(
+   git
+   npm
+   colored-man-pages
+   aws
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -86,9 +91,9 @@ source $ZSH/oh-my-zsh.sh
 export LS_COLORS=$LS_COLORS:'ow=01;94'
 
 BULLETTRAIN_PROMPT_ORDER=(
+   custom
    time
    status
-   custom
    context
    dir
    perl
@@ -127,51 +132,22 @@ BULLETTRAIN_VIRTUALENV_PREFIX=
 BULLETTRAIN_STATUS_EXIT_SHOW=true
 
 BULLETTRAIN_DIR_EXTENDED=0
-BULLETTRAIN_CONTEXT_HOSTNAME=
+BULLETTRAIN_CONTEXT_HOSTNAME=@%m
 BULLETTRAIN_GIT_PROMPT_CMD='$(printf " "; git rev-parse --abbrev-ref HEAD)'
 BULLETTRAIN_GIT_EXTENDED=false
 
-export DISPLAY=:0.0
+_dot_d=$HOME/.zshrc.d
 
-xssh() {
-   ssh -C -R6000:localhost:6000 $*
-}
+# Load additional settings, if any.
+if [[ -d $_dot_d ]]; then
+   ls $_dot_d | while read _file; do
+      source "$_dot_d/$_file"
+   done
+fi
 
+unset _dot_d _file
 
-alias wgit='/mnt/c/Program\ Files/Git/bin/git.exe'
+# Automatically find new executables in path
+zstyle ':completion:*' rehash true
 
-function git {
-   local rwd="$(realpath "$(pwd)")"
-
-   case $rwd in
-      /mnt/c/*)
-         ;&
-      /mnt/d/*)
-         wgit "$@"
-         ;;
-      *)
-         command git "$@"
-         ;;
-   esac
-}
-
-function gradlew {
-   local cmd='/mnt/c/WINDOWS/system32/cmd.exe'
-   local rwd="$(realpath "$(pwd)")"
-
-   case $rwd in
-      /mnt/c/*)
-         ;&
-      /mnt/d/*)
-         $cmd /c gradlew.bat "$@"
-         ;;
-      *)
-         if [[ -e $PWD/gradlew ]]; then
-             $PWD/gradlew "$@"
-         else
-            command gradlew "$@"
-         fi
-         ;;
-   esac
-}
 

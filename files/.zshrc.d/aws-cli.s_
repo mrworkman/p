@@ -1,0 +1,3 @@
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit && compinit
+complete -C '/sbin/aws_completer' aws

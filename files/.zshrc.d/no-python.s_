@@ -1,0 +1,33 @@
+function python {
+    local _python
+
+    # As `which` is a shell built-in, we need to use `command which` to use the
+    # actual `which` binary, otherwise `which` will just echo this function.
+    _python=$(command which python)
+
+    if [[ -z $VIRTUAL_ENV || ! $_python =~ ^$VIRTUAL_ENV ]]; then
+        tput setaf 1
+        printf "Don't use bare 'python' outside of an active venv.\n" >&2
+        printf "Use a versioned binary (e.g., 'python3.8') instead.\n" >&2
+        tput sgr0
+    else
+        command python "$@"
+    fi
+}
+
+function pip {
+    local _pip
+
+    # As `which` is a shell built-in, we need to use `command which` to use the
+    # actual `which` binary, otherwise `which` will just echo this function.
+    _pip=$(command which pip)
+
+    if [[ -z $VIRTUAL_ENV || ! $_pip =~ ^$VIRTUAL_ENV ]]; then
+        tput setaf 1
+        printf "Don't use bare 'pip' outside of an active venv.\n"
+        printf "Use a versioned binary (e.g., 'pip3.8') instead.\n"
+        tput sgr0
+    else
+        command pip "$@"
+    fi
+}
