@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/bash -a
 
 repo_dir="__prepo_"
-script_dir=$(dirname $(realpath "$0"))
+script_dir=$(dirname "$0")
 
 wsl=false
 distro=UNKNOWN
@@ -9,7 +9,11 @@ distro_release=UNKNOWN
 
 user=$(id -nu)
 group=$(id -ng)
-user_dir=$(eval "echo ~$user")
+user_dir=$(eval "printf ~$user")
+
+root_user=$(sudo id -nu)
+root_group=$(sudo id -ng)
+root_dir=$(eval "printf ~$root_user")
 
 if [[ $user == "root" ]]; then
    tput setaf 1
@@ -42,6 +46,12 @@ function determine_distro {
 
       return
    fi
+
+   # Check if we're on MacOS.
+   if [[ $OSTYPE =~ ^darwin ]]; then
+      distro=$(sw_vers -productName)
+      distro_release=$(sw_vers -productVersion)
+   fi
 }
 
 function print_result_or_die {
@@ -49,7 +59,8 @@ function print_result_or_die {
    local r=$2
 
    if [[ $r -ne 0 ]]; then
-      formatted=$(printf "$o" | awk '{ x=gensub("^", "--ERROR-> ", "G"); printf x "\n" }')
+      # formatted=$(printf "$o" | awk '{ x=gensub("^", "--ERROR-> ", "G"); printf x "\n" }')
+      formatted=
 
       printf " ❌\n"
 
@@ -79,7 +90,14 @@ function install_package_dist {
          o=$(sudo yum install -y "X$package")
          r=$?
          ;;
-      *) ;;
+      macOS)
+         o=$(brew install "$package" 2>&1 > /dev/null)
+         r=$?
+         ;;
+      *) 
+         printf "\n$distro isn't supported yet 😬\n" >&2
+         exit 1
+         ;;
    esac > /dev/null
 
    print_result_or_die "$o" $r
@@ -99,7 +117,14 @@ function remove_package_dist {
          o=$(sudo yum remove -y "$package" 2>&1 > /dev/null)
          r=$?
          ;;
-      *) ;;
+      macOS)
+         o=$(brew uninstall "$package" 2>&1 > /dev/null)
+         r=$?
+         ;;
+      *) 
+         printf "$distro isn't supported yet 😬\n" >&2
+         exit 1
+         ;;
    esac
 
    print_result_or_die "$o" $r
@@ -107,20 +132,13 @@ function remove_package_dist {
 
 function install_package {
    package="$1"
-   
-   # What we do depends on whether we're on WSL.
-   case $wsl in
-      false) install=$2
-         ;;
-      *) install=$3
-         ;;
-   esac
+   install=$2
    
    # Install or remove package based on $install flag.
    case $install in
-      true) install_package_dist $package
+      false) remove_package_dist $package
          ;;
-      *) remove_package_dist $package
+      *) install_package_dist $package
          ;;
    esac
 }
@@ -129,7 +147,7 @@ function install_python2_package {
    package="$1"
 
    printf "Installing Python 2 '$package'..."
-   o=$(sudo /usr/local/bin/pip2 install "$package" 2>&1 > /dev/null)
+   o=$(sudo python2 -m pip install "$package" 2>&1 > /dev/null)
    r=$?
    print_result_or_die "$o" $r
 }
@@ -138,29 +156,7 @@ function install_python3_package {
    package="$1"
 
    printf "Installing Python 3 '$package'..."
-   o=$(sudo /usr/local/bin/pip3 install "$package" 2>&1 > /dev/null)
-   r=$?
-   print_result_or_die "$o" $r
-}
-
-function install_pip27 {
-   [[ -e /usr/local/bin/pip2 ]] && return
-
-   # NB: WSL2 does not currently support IPv6, so curl must explicitly use `-4`.
-
-   printf "Installing pip for python2..."
-   o=$(sudo curl -s4 https://bootstrap.pypa.io/pip/2.7/get-pip.py | sudo python2 2>&1 > /dev/null)
-   r=$?
-   print_result_or_die "$o" $r
-}
-
-function install_pip3 {
-   [[ -e /usr/local/bin/pip3 ]] && return
-
-   # NB: WSL2 does not currently support IPv6, so curl must explicitly use `-4`.
-
-   printf "Installing pip for python3..."
-   o=$(sudo curl -s4 https://bootstrap.pypa.io/get-pip.py | sudo python3 2>&1 > /dev/null)
+   o=$(sudo python3 -m pip install "$package" 2>&1 > /dev/null)
    r=$?
    print_result_or_die "$o" $r
 }
@@ -205,10 +201,13 @@ function configure_tmux {
    local u=
    local install_source="https://github.com/tmux-plugins/tpm.git"
 
-   for u in $user root; do
-      local user_dir="$(eval "echo ~$u")"
-      local tmux_dir="$user_dir/.tmux/plugins/tpm"
+   for items in $user:$group:$user_dir $root_user:$root_group:$root_dir; do
+      IFS=: read u g ud <<.
+$items
+.
+      printf "DDDDD: $u, $g, $ud\n"
 
+      local tmux_dir="$ud/.tmux/plugins/tpm"
       local exists=$(sudo -H -u $u bash -c "[[ -e $tmux_dir ]]; echo \$?")
 
       if [[ $exists -ne 0 ]]; then
@@ -223,8 +222,8 @@ function configure_tmux {
       # r=$?
       # print_result_or_die "$o" $r
 
-      install_file files/.tmux.conf  $user_dir                      0644 $u $g
-      install_file files/maglev.tmux $user_dir/.tmux/plugins/maglev 0744 $u $g
+      install_file files/.tmux.conf  $ud                      0644 $u $g
+      install_file files/maglev.tmux $ud/.tmux/plugins/maglev 0744 $u $g
    done
 }
 
@@ -252,12 +251,13 @@ function configure_ssh {
 }
 
 function configure_zsh {
-   local u=
    local install_source="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
-   for u in $user root; do
-      local user_dir="$(eval "echo ~$u")"
-      local omzsh_dir="$user_dir/.oh-my-zsh"
+   for items in $user:$group:$user_dir $root_user:$root_group:$root_dir; do
+      IFS=: read u g ud <<.
+$items
+.
+      local omzsh_dir="$ud/.oh-my-zsh"
 
       printf "Removing existing '$omzsh_dir'..."
       o=$(sudo -Hu $u bash -c "rm -Rf $omzsh_dir" 2>&1 > /dev/null)
@@ -270,12 +270,8 @@ function configure_zsh {
       print_result_or_die "$o" $r
 
       install_file files/bullet-train.zsh-theme $omzsh_dir/themes/ 0644 $u $g
-      install_file files/.zshrc $user_dir                          0644 $u $g
+      install_file files/.zshrc $ud                                0644 $u $g
    done
-}
-
-function clean_up {
-   sudo apt-get -y autoremove > /dev/null
 }
 
 printf "Starting...\n"
@@ -296,57 +292,30 @@ printf "Release: $distro_release\n"
 printf "==========================\n"
 printf "\n"
 
-if [[ $distro != "ubuntu" ]]; then
+if [[ $distro != "ubuntu" && $distro != "macOS" ]]; then
    printf "Unsupported distro! 😟\n\n"
    exit 1
 fi >&2
 
-#               package name   | dist |  wsl |
-install_package 'coreutils'      true   true
-install_package 'zsh'            true   true
-install_package 'nano'           false  false
-install_package 'vim-nox'        true   true
-install_package 'git'            true   true
-install_package 'unity'          true   false
-install_package 'gnome-terminal' true   false
-install_package 'xsel'           true   true
-install_package 'tmux'           true   true
+if [[ ! -e distros/$distro.sh ]]; then
+   printf "Couldn't find $distro shell script 😬\n\n"
+   exit 1
+fi >&2
 
-if [[ $distro == "ubuntu" ]]; then
+# Run distro-specific installations.
+distros/$distro.sh
 
-   case "$distro_release" in
-      18*)
-         install_package 'python'            true   true
-         install_package 'python-pip'        true   true
-         ;;
-      20*)
-         install_package 'python-is-python2' true   true
-         install_pip27
-         ;;
-   esac
-
+# TODO: Move this.
+if [[ $distro == "macOS" ]]; then
+   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-install_package 'python3'           true   true
-install_package 'python3-venv'      true   true
-install_package 'python3-distutils' true   true
-install_pip3
-
-install_package 'gcc'               true   true
-install_package 'make'              true   true
-install_package 'automake'          true   true
-install_package 'openssh-server'    true   false
-
-install_package 'libreoffice'       false  false
-install_package 'firefox'           true   false
-install_package 'gtk-chtheme'       true   false
-install_package 'xdg-utils'         true   true  # needed for tmux
-install_package 'xrdp'              true   false
-install_package 'xorgxrdp'          true   false
+# Install packages common to all OSes.
+install_package git true
+install_package tmux true
+install_package xsel true
 
 install_rust
-
-clean_up -y
 
 printf "\n"
 
@@ -376,11 +345,12 @@ dirs=(
    .tmux               
    .tmux/plugins       
    .tmux/plugins/maglev
+   .zshrc.d
 )
 
-for pair in $user:$group:$user_dir root:root:/root; do
+for items in $user:$group:$user_dir $root_user:$root_group:$root_dir; do
    IFS=: read u g ud <<.
-   $pair
+$items
 .
 
    for dir in ${dirs[*]}; do
@@ -393,12 +363,14 @@ for pair in $user:$group:$user_dir root:root:/root; do
    install_file files/PaperColor.vim   $ud/.vim/colors 0644 $u $g
 
    printf "Changing $u's default shell to zsh..."
-   o=$(sudo -H chsh -s /usr/bin/zsh $u 2>&1 > /dev/null)
+   o=$(sudo -H chsh -s $(which zsh) $u 2>&1 > /dev/null)
    r=$?
    print_result_or_die "$o" $r
 done
 
-install_file files/vimrc.local /etc/vim 0644 root root
+if [[ $distro == "ubuntu" ]]; then
+   install_file files/vimrc.local /etc/vim 0644 $root_user $root_group
+fi
 
 printf "\n"
 
@@ -408,7 +380,7 @@ configure_zsh
 configure_tmux
 configure_ssh
 
-if [[ ! $wsl ]]; then
+if [[ $distro == "ubuntu" && ! $wsl ]]; then
    install_file files/.fonts.conf                  $user_dir 0644
    install_file files/gnome-terminal-profile.dconf /tmp      0644
 
@@ -417,6 +389,10 @@ if [[ ! $wsl ]]; then
    r=$?
    print_result_or_die "$o" $r
 fi
+
+for f in files/.zshrc.d/*; do
+   install_file $f $user_dir/.zshrc.d/ 0644
+done
 
 # Return to the directory the caller was in.
 [[ $cloned ]] && popd > /dev/null

@@ -493,11 +493,16 @@ prompt_dir() {
     dir="${dir}%4(c:...:)%3c"
   fi
 
-  rwd="$(realpath "$(pwd)")"
+  # MacOS doesn't have realpath, but we don't need it there either, since
+  # this is just for a WSL-specific scenario.
+  type realpath > /dev/null
+  if [[ $? -eq 0 ]]; then
+    rwd="$(realpath "$(pwd)")"
 
-  # Show a Windows logo if it looks like we're using a WSL mounted directory.
-  if [[ "$rwd" =~ ^/mnt/[c-z]/ || "$rwd" =~ ^/mnt/[c-z]$ ]]; then
-    dir="者 ${dir}"
+    # Show a Windows logo if it looks like we're using a WSL mounted directory.
+    if [[ "$rwd" =~ ^/mnt/[c-z]/ || "$rwd" =~ ^/mnt/[c-z]$ ]]; then
+      dir="者 ${dir}"
+    fi
   fi
 
   prompt_segment $BULLETTRAIN_DIR_BG $BULLETTRAIN_DIR_FG $dir "\u200A" # "Hair space"

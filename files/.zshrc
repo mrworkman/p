@@ -141,7 +141,9 @@ _dot_d=$HOME/.zshrc.d
 # Load additional settings, if any.
 if [[ -d $_dot_d ]]; then
    ls $_dot_d | while read _file; do
-      source "$_dot_d/$_file"
+      if [[ $_file =~ \.sh$ ]]; then
+         source "$_dot_d/$_file"
+      fi
    done
 fi
 

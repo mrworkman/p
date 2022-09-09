@@ -17,3 +17,5 @@ set expandtab
 set cindent
 set hlsearch
 set nu
+
+syntax on
