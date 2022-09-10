@@ -250,6 +250,25 @@ function configure_ssh {
    install_file files/ssh-config $user_dir/.ssh/config 0600
 }
 
+function configure_vim {
+   local install_source="https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+
+   for items in $user:$group:$user_dir $root_user:$root_group:$root_dir; do
+      IFS=: read u g ud <<.
+$items
+.
+      printf "Installing 'Plug' vim plugin manager for user $u..."
+      o=$(sudo -Hu $u bash -c "curl -fLo ~/.vim/autoload/plug.vim --create-dirs $install_source" 2>&1 > /dev/null)
+      r=$?
+      print_result_or_die "$o" $r
+
+      printf "Installing vim plugins for user $u..."
+      o=$(sudo -Hu $u bash -c "vim -c PlugInstall -c :q -c :q" 2>&1 > /dev/null)
+      r=$?
+      print_result_or_die "$o" $r
+   done
+}
+
 function configure_zsh {
    local install_source="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
@@ -374,7 +393,11 @@ fi
 
 printf "\n"
 
-install_python2_package powerline-status
+# install_python2_package powerline-status
+
+# This expects vim to be installed already.
+# So, make sure the OS specific script is set up correctly.
+configure_vim
 
 configure_zsh
 configure_tmux
