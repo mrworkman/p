@@ -136,6 +136,9 @@ BULLETTRAIN_CONTEXT_HOSTNAME=@%m
 BULLETTRAIN_GIT_PROMPT_CMD='$(printf " "; git rev-parse --abbrev-ref HEAD)'
 BULLETTRAIN_GIT_EXTENDED=false
 
+BULLETTRAIN_VIRTUALENV_BG=162
+BULLETTRAIN_VIRTUALENV_FG=255
+
 _dot_d=$HOME/.zshrc.d
 
 # Load additional settings, if any.

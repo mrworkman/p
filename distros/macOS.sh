@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 function install_homebrew {
    printf "Installig 'homebrew' for user '$user'..."

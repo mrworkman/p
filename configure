@@ -205,8 +205,6 @@ function configure_tmux {
       IFS=: read u g ud <<.
 $items
 .
-      printf "DDDDD: $u, $g, $ud\n"
-
       local tmux_dir="$ud/.tmux/plugins/tpm"
       local exists=$(sudo -H -u $u bash -c "[[ -e $tmux_dir ]]; echo \$?")
 
