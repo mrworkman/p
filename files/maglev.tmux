@@ -108,11 +108,11 @@ apply_theme() {
     if [ x"`tmux -q -L tmux_theme_status_left_test -f /dev/null new-session -d \; show -g -v status-left \; kill-session`" = x"[#S] " ] ; then
         status_left="$status_left "
     fi
-    tmux set -g status-left-length 32 \; set -g status-left "$status_left"
+    tmux set -g status-left-length 32 \; set -g status-left "$status_left "
 
     window_status_fg=colour0 # gray
     window_status_bg=colour10 # dark gray
-    window_status_format="#[fg=$status_bg]$left_separator_black#[fg=$window_status_fg] #I #W #[fg=$window_status_bg,bg=$status_bg]$left_separator_black"
+    window_status_format="#[fg=$window_status_fg,bg=$window_status_bg]$left_separator_black #I $left_separator #W #[fg=$window_status_bg,bg=$status_bg]$left_separator_black"
     tmux setw -g window-status-style fg=$window_status_fg,bg=$window_status_bg \; setw -g window-status-format "$window_status_format"
 
     window_status_current_fg=colour0 # black
