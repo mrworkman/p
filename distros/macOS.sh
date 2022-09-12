@@ -40,3 +40,5 @@ install_pyenv
 # Installation of MacOS specific packages should happen below.
 # e.g.,
 # install_package 'vim' true
+
+install_package htop true
