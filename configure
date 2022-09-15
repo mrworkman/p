@@ -286,8 +286,8 @@ $items
       r=$?
       print_result_or_die "$o" $r
 
-      install_file files/bullet-train.zsh-theme $omzsh_dir/themes/ 0644 $u $g
-      install_file files/.zshrc $ud                                0644 $u $g
+      install_file files/bullet-train.zsh-theme $omzsh_dir/custom/themes/ 0644 $u $g
+      install_file files/.zshrc $ud                                       0644 $u $g
    done
 }
 

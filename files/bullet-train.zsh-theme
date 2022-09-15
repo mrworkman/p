@@ -118,6 +118,17 @@ if [ ! -n "${BULLETTRAIN_AWS_PREFIX+1}" ]; then
   BULLETTRAIN_AWS_PREFIX="☁️"
 fi
 
+# AWS VAULT
+if [[ ! -n ${BULLETTRAIN_AWS_VAULT_BG+1} ]]; then
+  BULLETTRAIN_AWS_VAULT_BG=11 #'\e[48;2;0;0;0m' <--- TODO
+fi
+if [[ ! -n ${BULLETTRAIN_AWS_VAULT_FG+1} ]]; then
+  BULLETTRAIN_AWS_VAULT_FG=black
+fi
+if [[ ! -n ${BULLETTRAIN_AWSV_AULT_PREFIX+1} ]]; then
+  BULLETTRAIN_AWS_VAULT_PREFIX=""
+fi
+
 # RUBY
 if [ ! -n "${BULLETTRAIN_RUBY_BG+1}" ]; then
   BULLETTRAIN_RUBY_BG=red
@@ -580,7 +591,7 @@ prompt_kctx() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    prompt_segment $BULLETTRAIN_VIRTUALENV_BG $BULLETTRAIN_VIRTUALENV_FG $BULLETTRAIN_VIRTUALENV_PREFIX" $(basename $virtualenv_path)"
+    prompt_segment $BULLETTRAIN_VIRTUALENV_BG $BULLETTRAIN_VIRTUALENV_FG $BULLETTRAIN_VIRTUALENV_PREFIX" $(python -V | cut -d" " -f2 | cut -d. -f-2) $(basename $virtualenv_path)"
   elif which pyenv &> /dev/null; then
     prompt_segment $BULLETTRAIN_VIRTUALENV_BG $BULLETTRAIN_VIRTUALENV_FG $BULLETTRAIN_VIRTUALENV_PREFIX" $(pyenv version | sed -e 's/ (set.*$//' | tr '\n' ' ' | sed 's/.$//')"
   fi
@@ -607,6 +618,11 @@ prompt_aws() {
 
   if [[ -n "$AWS_PROFILE" ]]; then
     prompt_segment $BULLETTRAIN_AWS_BG $BULLETTRAIN_AWS_FG $BULLETTRAIN_AWS_PREFIX$spaces$AWS_PROFILE
+  fi
+
+  if [[ -n $AWS_VAULT ]]; then
+    prompt_segment $BULLETTRAIN_AWS_VAULT_BG $BULLETTRAIN_AWS_VAULT_FG \
+                   $BULLETTRAIN_AWS_VAULT_PREFIX$spaces$AWS_VAULT
   fi
 }
 
