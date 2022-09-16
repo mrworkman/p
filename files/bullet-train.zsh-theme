@@ -54,24 +54,24 @@ fi
 
 # STATUS
 if [ ! -n "${BULLETTRAIN_STATUS_EXIT_SHOW+1}" ]; then
-  BULLETTRAIN_STATUS_EXIT_SHOW=false
+  BULLETTRAIN_STATUS_EXIT_SHOW=true
 fi
 if [ ! -n "${BULLETTRAIN_STATUS_BG+1}" ]; then
-  BULLETTRAIN_STATUS_BG=green
+  BULLETTRAIN_STATUS_BG=34
 fi
 if [ ! -n "${BULLETTRAIN_STATUS_ERROR_BG+1}" ]; then
-  BULLETTRAIN_STATUS_ERROR_BG=red
+  BULLETTRAIN_STATUS_ERROR_BG=160
 fi
 if [ ! -n "${BULLETTRAIN_STATUS_FG+1}" ]; then
-  BULLETTRAIN_STATUS_FG=white
+  BULLETTRAIN_STATUS_FG=255
 fi
 
 # TIME
 if [ ! -n "${BULLETTRAIN_TIME_BG+1}" ]; then
-  BULLETTRAIN_TIME_BG=white
+  BULLETTRAIN_TIME_BG=241
 fi
 if [ ! -n "${BULLETTRAIN_TIME_FG+1}" ]; then
-  BULLETTRAIN_TIME_FG=black
+  BULLETTRAIN_TIME_FG=0
 fi
 
 # CUSTOM
@@ -85,15 +85,26 @@ if [ ! -n "${BULLETTRAIN_CUSTOM_FG+1}" ]; then
   BULLETTRAIN_CUSTOM_FG=default
 fi
 
+# PYENV
+if [ ! -n "${BULLETTRAIN_PYENV_BG+1}" ]; then
+  BULLETTRAIN_PYENV_BG=7
+fi
+if [ ! -n "${BULLETTRAIN_PYENV_FG+1}" ]; then
+  BULLETTRAIN_PYENV_FG=0
+fi
+if [ ! -n "${BULLETTRAIN_PYENV_PREFIX+1}" ]; then
+  BULLETTRAIN_PYENV_PREFIX=
+fi
+
 # VIRTUALENV
 if [ ! -n "${BULLETTRAIN_VIRTUALENV_BG+1}" ]; then
-  BULLETTRAIN_VIRTUALENV_BG=yellow
+  BULLETTRAIN_VIRTUALENV_BG=162
 fi
 if [ ! -n "${BULLETTRAIN_VIRTUALENV_FG+1}" ]; then
-  BULLETTRAIN_VIRTUALENV_FG=white
+  BULLETTRAIN_VIRTUALENV_FG=0
 fi
 if [ ! -n "${BULLETTRAIN_VIRTUALENV_PREFIX+1}" ]; then
-  BULLETTRAIN_VIRTUALENV_PREFIX=🐍
+  BULLETTRAIN_VIRTUALENV_PREFIX=
 fi
 
 # NVM
@@ -120,13 +131,13 @@ fi
 
 # AWS VAULT
 if [[ ! -n ${BULLETTRAIN_AWS_VAULT_BG+1} ]]; then
-  BULLETTRAIN_AWS_VAULT_BG=11 #'\e[48;2;0;0;0m' <--- TODO
+  BULLETTRAIN_AWS_VAULT_BG=3 #'\e[48;2;0;0;0m' <--- TODO
 fi
 if [[ ! -n ${BULLETTRAIN_AWS_VAULT_FG+1} ]]; then
-  BULLETTRAIN_AWS_VAULT_FG=black
+  BULLETTRAIN_AWS_VAULT_FG=8
 fi
 if [[ ! -n ${BULLETTRAIN_AWSV_AULT_PREFIX+1} ]]; then
-  BULLETTRAIN_AWS_VAULT_PREFIX=""
+  BULLETTRAIN_AWS_VAULT_PREFIX=""
 fi
 
 # RUBY
@@ -186,16 +197,16 @@ fi
 
 # DIR
 if [ ! -n "${BULLETTRAIN_DIR_BG+1}" ]; then
-  BULLETTRAIN_DIR_BG=blue
+  BULLETTRAIN_DIR_BG=12
 fi
 if [ ! -n "${BULLETTRAIN_DIR_FG+1}" ]; then
-  BULLETTRAIN_DIR_FG=white
+  BULLETTRAIN_DIR_FG=0
 fi
 if [ ! -n "${BULLETTRAIN_DIR_CONTEXT_SHOW+1}" ]; then
   BULLETTRAIN_DIR_CONTEXT_SHOW=false
 fi
 if [ ! -n "${BULLETTRAIN_DIR_EXTENDED+1}" ]; then
-  BULLETTRAIN_DIR_EXTENDED=1
+  BULLETTRAIN_DIR_EXTENDED=0
 fi
 
 # GIT
@@ -209,16 +220,17 @@ if [ ! -n "${BULLETTRAIN_GIT_COLORIZE_DIRTY_BG_COLOR+1}" ]; then
   BULLETTRAIN_GIT_COLORIZE_DIRTY_BG_COLOR=yellow
 fi
 if [ ! -n "${BULLETTRAIN_GIT_BG+1}" ]; then
-  BULLETTRAIN_GIT_BG=white
+  BULLETTRAIN_GIT_BG=24
 fi
 if [ ! -n "${BULLETTRAIN_GIT_FG+1}" ]; then
-  BULLETTRAIN_GIT_FG=black
+  BULLETTRAIN_GIT_FG=255
 fi
 if [ ! -n "${BULLETTRAIN_GIT_EXTENDED+1}" ]; then
-  BULLETTRAIN_GIT_EXTENDED=true
+  BULLETTRAIN_GIT_EXTENDED=false
 fi
 if [ ! -n "${BULLETTRAIN_GIT_PROMPT_CMD+1}" ]; then
-  BULLETTRAIN_GIT_PROMPT_CMD="\$(git_prompt_info)"
+  # BULLETTRAIN_GIT_PROMPT_CMD="\$(git_prompt_info)"
+  BULLETTRAIN_GIT_PROMPT_CMD='$(printf " "; git rev-parse --abbrev-ref HEAD)'
 fi
 
 # PERL
@@ -234,10 +246,10 @@ fi
 
 # CONTEXT
 if [ ! -n "${BULLETTRAIN_CONTEXT_BG+1}" ]; then
-  BULLETTRAIN_CONTEXT_BG=black
+  BULLETTRAIN_CONTEXT_BG=253
 fi
 if [ ! -n "${BULLETTRAIN_CONTEXT_FG+1}" ]; then
-  BULLETTRAIN_CONTEXT_FG=default
+  BULLETTRAIN_CONTEXT_FG=237
 fi
 if [ ! -n "${BULLETTRAIN_CONTEXT_HOSTNAME+1}" ]; then
   BULLETTRAIN_CONTEXT_HOSTNAME=@%m
@@ -326,10 +338,10 @@ if [ ! -n "${BULLETTRAIN_EXEC_TIME_ELAPSED+1}" ]; then
   BULLETTRAIN_EXEC_TIME_ELAPSED=5
 fi
 if [ ! -n "${BULLETTRAIN_EXEC_TIME_BG+1}" ]; then
-  BULLETTRAIN_EXEC_TIME_BG=yellow
+  BULLETTRAIN_EXEC_TIME_BG=220
 fi
 if [ ! -n "${BULLETTRAIN_EXEC_TIME_FG+1}" ]; then
-  BULLETTRAIN_EXEC_TIME_FG=black
+  BULLETTRAIN_EXEC_TIME_FG=232
 fi
 
 
@@ -591,9 +603,13 @@ prompt_kctx() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    prompt_segment $BULLETTRAIN_VIRTUALENV_BG $BULLETTRAIN_VIRTUALENV_FG $BULLETTRAIN_VIRTUALENV_PREFIX" $(python -V | cut -d" " -f2 | cut -d. -f-2) $(basename $virtualenv_path)"
+    prompt_segment $BULLETTRAIN_VIRTUALENV_BG \
+                   $BULLETTRAIN_VIRTUALENV_FG \
+                   $BULLETTRAIN_VIRTUALENV_PREFIX" $(python -V | cut -d" " -f2) [$(basename $virtualenv_path)]"
   elif which pyenv &> /dev/null; then
-    prompt_segment $BULLETTRAIN_VIRTUALENV_BG $BULLETTRAIN_VIRTUALENV_FG $BULLETTRAIN_VIRTUALENV_PREFIX" $(pyenv version | sed -e 's/ (set.*$//' | tr '\n' ' ' | sed 's/.$//')"
+    prompt_segment $BULLETTRAIN_PYENV_BG \
+                   $BULLETTRAIN_PYENV_FG \
+                   $BULLETTRAIN_PYENV_PREFIX" $(pyenv version | sed -e 's/ (set.*$//' | tr '\n' ' ' | sed 's/.$//')"
   fi
 }
 

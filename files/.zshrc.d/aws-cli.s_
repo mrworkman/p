@@ -1,3 +1,9 @@
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
-complete -C '/sbin/aws_completer' aws
+complete -C 'aws_completer' aws
+
+command which aws-vault > /dev/null
+
+if [[ $? -eq 0 ]]; then
+    eval "$(aws-vault --completion-script-zsh)"
+fi

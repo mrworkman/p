@@ -25,7 +25,7 @@ fi
 
 function determine_distro {
    if [[ $WSL_DISTRO_NAME != "" || "$(uname -r)" =~ icrosoft ]]; then
-      wsl=true 
+      wsl=true
    fi
 
    if [[ -e /etc/redhat-release ]]; then
@@ -94,7 +94,7 @@ function install_package_dist {
          o=$(brew install "$package" 2>&1 > /dev/null)
          r=$?
          ;;
-      *) 
+      *)
          printf "\n$distro isn't supported yet 😬\n" >&2
          exit 1
          ;;
@@ -121,7 +121,7 @@ function remove_package_dist {
          o=$(brew uninstall "$package" 2>&1 > /dev/null)
          r=$?
          ;;
-      *) 
+      *)
          printf "$distro isn't supported yet 😬\n" >&2
          exit 1
          ;;
@@ -133,7 +133,7 @@ function remove_package_dist {
 function install_package {
    package="$1"
    install=$2
-   
+
    # Install or remove package based on $install flag.
    case $install in
       false) remove_package_dist $package
@@ -179,7 +179,7 @@ function install_file {
    local source="$1"
    local target="$2"
    local mode="${3:+-m $3}"
-   
+
    local user=${4:-$user}
    local owner="-o ${4:-$user}"
    local group="-g ${5:-$group}"
@@ -226,7 +226,7 @@ $items
 }
 
 function configure_ssh {
-   
+
    if [[ ! -e $user_dir/.ssh/id_rsa ]]; then
       printf "Creating default SSH key for '$user'..."
       o=$(ssh-keygen -t rsa -b 8192 -f $user_dir/.ssh/id_rsa -N '' 2>&1 > /dev/null)
@@ -339,7 +339,7 @@ printf "\n"
 # Clone the repo, if we're not running from a local script.
 if [[ ! -e .git &&  ! -e .p_repo ]]; then
    cloned=true
-   
+
    printf "Cloning repo..."
 
    o=$(rm -Rf $repo_dir 2>&1 > /dev/null)
@@ -354,13 +354,14 @@ if [[ ! -e .git &&  ! -e .p_repo ]]; then
 fi
 
 dirs=(
-   .local              
-   .local/share        
-   .local/share/fonts  
-   .vim                
-   .vim/colors          
-   .tmux               
-   .tmux/plugins       
+   .local
+   .local/share
+   .local/share/fonts
+   .pyenv/plugins/mrworkman/etc/pyenv.d/which
+   .vim
+   .vim/colors
+   .tmux
+   .tmux/plugins
    .tmux/plugins/maglev
    .zshrc.d
 )
@@ -374,10 +375,11 @@ $items
       install_dir $ud/$dir 0755 $u $g
    done
 
-   install_file files/.selected_editor $ud             0644 $u $g
-   install_file files/.vimrc           $ud             0644 $u $g
-   install_file files/.gitconfig       $ud             0644 $u $g
-   install_file files/PaperColor.vim   $ud/.vim/colors 0644 $u $g
+   install_file files/.selected_editor  $ud             0644 $u $g
+   install_file files/.vimrc            $ud             0644 $u $g
+   install_file files/.gitconfig        $ud             0644 $u $g
+   install_file files/PaperColor.vim    $ud/.vim/colors 0644 $u $g
+   install_file files/pyenv-custom.bash $ud/.pyenv/plugins/mrworkman/etc/pyenv.d/which 0644 $u $g
 
    printf "Changing $u's default shell to zsh..."
    o=$(sudo -H chsh -s $(which zsh) $u 2>&1 > /dev/null)
