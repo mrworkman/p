@@ -42,3 +42,5 @@ install_pyenv
 # install_package 'vim' true
 
 install_package htop true
+install_package zsh-syntax-highlighting
+install_package brew install zsh-history-substring-search
