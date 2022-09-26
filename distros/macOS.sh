@@ -43,4 +43,5 @@ install_pyenv
 
 install_package htop true
 install_package zsh-syntax-highlighting
-install_package brew install zsh-history-substring-search
+install_package zsh-history-substring-search
+install_package zsh-autosuggestions
