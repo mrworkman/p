@@ -30,3 +30,15 @@ HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND="bg=1,fg=0"
 HISTORY_SUBSTRING_SEARCH_FUZZY=on
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=on
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+
+local_bin="$HOME/.local/bin"
+
+if [[ ! -e "$local_bin" ]]; then
+    mkdir -p "$local_bin"
+fi
+
+if [[ ! $path =~ ${local_bin//\./\\.} ]]; then
+    path=("$local_bin" $path)
+fi
+
+unset local_bin
