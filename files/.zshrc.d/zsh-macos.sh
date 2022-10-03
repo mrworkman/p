@@ -1,6 +1,7 @@
 setopt nobeep                   # Silence!
 setopt histignorealldups        # If a new command is a duplicate, remove the older one
 setopt inc_append_history       # save commands are added to the history immediately, otherwise only when shell exits.
+setopt noautocd
 
 # Colored completion (different colors for dirs/files/etc)
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
