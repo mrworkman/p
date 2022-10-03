@@ -24,7 +24,7 @@ bindkey "$terminfo[kcud1]" history-substring-search-down
 bindkey '^[[A' history-substring-search-up			
 bindkey '^[[B' history-substring-search-down
 
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=15"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=253"
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND="bg=220,fg=7"
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND="bg=1,fg=0"
 HISTORY_SUBSTRING_SEARCH_FUZZY=on
