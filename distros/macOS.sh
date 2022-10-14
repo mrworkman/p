@@ -45,3 +45,4 @@ install_package htop true
 install_package zsh-syntax-highlighting
 install_package zsh-history-substring-search
 install_package zsh-autosuggestions
+install_package watch
