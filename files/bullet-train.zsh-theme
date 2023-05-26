@@ -230,7 +230,7 @@ if [ ! -n "${BULLETTRAIN_GIT_EXTENDED+1}" ]; then
 fi
 if [ ! -n "${BULLETTRAIN_GIT_PROMPT_CMD+1}" ]; then
   # BULLETTRAIN_GIT_PROMPT_CMD="\$(git_prompt_info)"
-  BULLETTRAIN_GIT_PROMPT_CMD='$(printf " "; git rev-parse --abbrev-ref HEAD)'
+  BULLETTRAIN_GIT_PROMPT_CMD='$(printf " "; git branch --show-current)'
 fi
 
 # PERL
