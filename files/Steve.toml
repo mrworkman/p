@@ -1,0 +1,46 @@
+[colors]
+
+ansi = [
+    "#eeeeee",
+    "#ba2619",
+    "#5d882e",
+    "#db7e31",
+    "#275d83",
+    "#6f5178",
+    "#3a8485",
+    "#2f3335",
+]
+
+background = "#eeeeee"
+
+brights = [
+    "#feffff",
+    "#db3f35",
+    "#7db341",
+    "#ef8a37",
+    "#3a84ab",
+    "#a680a5",
+    "#4eadae",
+    "#758186",
+]
+
+cursor_bg = "#2f3335"
+cursor_border = "#758186"
+cursor_fg = "#feffff"
+foreground = "#5b5d5e"
+selection_bg = "#444444"
+selection_fg = "#eeeeee"
+
+[colors.indexed]
+# 16 = "#d70000"
+# 17 = "#005f87"
+# 18 = "#af0000"
+# 19 = "#008700"
+# 20 = "#0087af"
+# 21 = "#005f87"
+
+[metadata]
+aliases = []
+author = "Stephen Workman"
+name = "Steve"
+origin_url = "https://github.com/mrworkman/p"

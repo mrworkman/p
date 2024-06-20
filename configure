@@ -378,8 +378,10 @@ $items
    install_file files/.selected_editor  $ud             0644 $u $g
    install_file files/.vimrc            $ud             0644 $u $g
    install_file files/.gitconfig        $ud             0644 $u $g
+   install_file files/.wezterm.lua      $ud             0644 $u $g
    install_file files/PaperColor.vim    $ud/.vim/colors 0644 $u $g
    install_file files/pyenv-custom.bash $ud/.pyenv/plugins/mrworkman/etc/pyenv.d/which 0644 $u $g
+   install_file files/Steve.toml        $ud/.config/wezterm/colors 0644 $u $g
 
    printf "Changing $u's default shell to zsh..."
    o=$(sudo -H chsh -s $(which zsh) $u 2>&1 > /dev/null)
