@@ -14,6 +14,20 @@ config.font = wezterm.font("Fira Code", { weight = "Regular" })
 config.font_size = 14
 config.enable_tab_bar = false
 
+-- MacOS specific.
+config.keys = {
+   {
+      key = "LeftArrow",
+      mods = "SUPER",
+      action = act.SendKey { key = 'Home', mods = "NONE" },
+   },
+   {
+      key = "RightArrow",
+      mods = "SUPER",
+      action = act.SendKey { key = 'End', mods = "NONE" },
+   },
+}
+
 config.window_padding = {
    left = 0,
    top = 2,
