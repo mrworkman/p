@@ -20,6 +20,7 @@ plugins=(
    npm
    colored-man-pages
    aws
+   rust
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -50,12 +51,13 @@ BULLETTRAIN_PROMPT_ORDER=(
    status
    context
    dir
+   virtualenv
+   rust
+   # nvm
+   go
    perl
    ruby
-   virtualenv
-   # nvm
    aws
-   go
    elixir
    git
    hg

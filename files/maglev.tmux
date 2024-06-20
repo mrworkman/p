@@ -21,7 +21,7 @@ tmux set -g @batt_attached_icon "︎♡"
 
 # Optional prefix highlight plugin
 tmux set -g @prefix_highlight_show_copy_mode 'on'
-tmux set -g @prefix_highlight_copy_mode_attr 'fg=black,bg=yellow,bold' # default is 'fg=default,bg=yellow'
+tmux set -g @prefix_highlight_copy_mode_attr 'fg=white,bg=yellow,bold' # default is 'fg=default,bg=yellow'
 
 # BEGIN Fix CPU segment --------------------------------------------------------
 
@@ -98,25 +98,25 @@ apply_theme() {
     tmux setw -g mode-style fg=$mode_fg,bg=$mode_bg,$mode_attr
 
     # status line
-    status_fg=colour7 # white
-    status_bg=colour255 # dark gray
+    status_fg=colour0
+    status_bg=colour7
     tmux set -g status-style fg=$status_fg,bg=$status_bg
 
-    session_fg=colour255  # black
-    session_bg=colour241 # yellow
+    session_fg=colour255
+    session_bg=colour241
     status_left="#[fg=$session_fg,bg=$session_bg,bold] ❐ #S #[fg=$session_bg,bg=$status_bg,nobold]$left_separator_black"
     if [ x"`tmux -q -L tmux_theme_status_left_test -f /dev/null new-session -d \; show -g -v status-left \; kill-session`" = x"[#S] " ] ; then
         status_left="$status_left "
     fi
     tmux set -g status-left-length 32 \; set -g status-left "$status_left "
 
-    window_status_fg=colour0 # gray
-    window_status_bg=colour10 # dark gray
+    window_status_fg=colour7
+    window_status_bg=colour10
     window_status_format="#[fg=$window_status_fg,bg=$window_status_bg]$left_separator_black #I $left_separator #W #[fg=$window_status_bg,bg=$status_bg]$left_separator_black"
     tmux setw -g window-status-style fg=$window_status_fg,bg=$window_status_bg \; setw -g window-status-format "$window_status_format"
 
-    window_status_current_fg=colour0 # black
-    window_status_current_bg=colour12 # blue
+    window_status_current_fg=colour7
+    window_status_current_bg=colour12
     window_status_current_format="#[fg=$status_bg,bg=$window_status_current_bg]$left_separator_black#[fg=$window_status_current_fg,bg=$window_status_current_bg,bold] #I $left_separator #W #[fg=$window_status_current_bg,bg=$status_bg,nobold]$left_separator_black"
     tmux setw -g window-status-current-format "$window_status_current_format"
     tmux set -g status-justify left

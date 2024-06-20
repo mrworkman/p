@@ -71,7 +71,7 @@ if [ ! -n "${BULLETTRAIN_TIME_BG+1}" ]; then
   BULLETTRAIN_TIME_BG=241
 fi
 if [ ! -n "${BULLETTRAIN_TIME_FG+1}" ]; then
-  BULLETTRAIN_TIME_FG=0
+  BULLETTRAIN_TIME_FG=7
 fi
 
 # CUSTOM
@@ -87,10 +87,10 @@ fi
 
 # PYENV
 if [ ! -n "${BULLETTRAIN_PYENV_BG+1}" ]; then
-  BULLETTRAIN_PYENV_BG=7
+  BULLETTRAIN_PYENV_BG=0
 fi
 if [ ! -n "${BULLETTRAIN_PYENV_FG+1}" ]; then
-  BULLETTRAIN_PYENV_FG=0
+  BULLETTRAIN_PYENV_FG=7
 fi
 if [ ! -n "${BULLETTRAIN_PYENV_PREFIX+1}" ]; then
   BULLETTRAIN_PYENV_PREFIX=
@@ -101,7 +101,7 @@ if [ ! -n "${BULLETTRAIN_VIRTUALENV_BG+1}" ]; then
   BULLETTRAIN_VIRTUALENV_BG=162
 fi
 if [ ! -n "${BULLETTRAIN_VIRTUALENV_FG+1}" ]; then
-  BULLETTRAIN_VIRTUALENV_FG=0
+  BULLETTRAIN_VIRTUALENV_FG=7
 fi
 if [ ! -n "${BULLETTRAIN_VIRTUALENV_PREFIX+1}" ]; then
   BULLETTRAIN_VIRTUALENV_PREFIX=
@@ -109,10 +109,10 @@ fi
 
 # NVM
 if [ ! -n "${BULLETTRAIN_NVM_BG+1}" ]; then
-  BULLETTRAIN_NVM_BG=green
+  BULLETTRAIN_NVM_BG=76
 fi
 if [ ! -n "${BULLETTRAIN_NVM_FG+1}" ]; then
-  BULLETTRAIN_NVM_FG=white
+  BULLETTRAIN_NVM_FG=0
 fi
 if [ ! -n "${BULLETTRAIN_NVM_PREFIX+1}" ]; then
   BULLETTRAIN_NVM_PREFIX="⬡ "
@@ -123,7 +123,7 @@ if [ ! -n "${BULLETTRAIN_AWS_BG+1}" ]; then
   BULLETTRAIN_AWS_BG=yellow
 fi
 if [ ! -n "${BULLETTRAIN_AWS_FG+1}" ]; then
-  BULLETTRAIN_AWS_FG=black
+  BULLETTRAIN_AWS_FG=white
 fi
 if [ ! -n "${BULLETTRAIN_AWS_PREFIX+1}" ]; then
   BULLETTRAIN_AWS_PREFIX="☁️"
@@ -134,7 +134,7 @@ if [[ ! -n ${BULLETTRAIN_AWS_VAULT_BG+1} ]]; then
   BULLETTRAIN_AWS_VAULT_BG=3 #'\e[48;2;0;0;0m' <--- TODO
 fi
 if [[ ! -n ${BULLETTRAIN_AWS_VAULT_FG+1} ]]; then
-  BULLETTRAIN_AWS_VAULT_FG=8
+  BULLETTRAIN_AWS_VAULT_FG=0
 fi
 if [[ ! -n ${BULLETTRAIN_AWSV_AULT_PREFIX+1} ]]; then
   BULLETTRAIN_AWS_VAULT_PREFIX=""
@@ -164,10 +164,10 @@ fi
 
 # Rust
 if [ ! -n "${BULLETTRAIN_RUST_BG+1}" ]; then
-  BULLETTRAIN_RUST_BG=black
+  BULLETTRAIN_RUST_BG=232
 fi
 if [ ! -n "${BULLETTRAIN_RUST_FG+1}" ]; then
-  BULLETTRAIN_RUST_FG=white
+  BULLETTRAIN_RUST_FG=214
 fi
 if [ ! -n "${BULLETTRAIN_RUST_PREFIX+1}" ]; then
   BULLETTRAIN_RUST_PREFIX="🦀"
@@ -200,7 +200,7 @@ if [ ! -n "${BULLETTRAIN_DIR_BG+1}" ]; then
   BULLETTRAIN_DIR_BG=12
 fi
 if [ ! -n "${BULLETTRAIN_DIR_FG+1}" ]; then
-  BULLETTRAIN_DIR_FG=0
+  BULLETTRAIN_DIR_FG=7
 fi
 if [ ! -n "${BULLETTRAIN_DIR_CONTEXT_SHOW+1}" ]; then
   BULLETTRAIN_DIR_CONTEXT_SHOW=false
@@ -252,7 +252,7 @@ if [ ! -n "${BULLETTRAIN_CONTEXT_FG+1}" ]; then
   BULLETTRAIN_CONTEXT_FG=237
 fi
 if [ ! -n "${BULLETTRAIN_CONTEXT_HOSTNAME+1}" ]; then
-  BULLETTRAIN_CONTEXT_HOSTNAME=@%m
+  BULLETTRAIN_CONTEXT_HOSTNAME= #@%m
 fi
 
 # GIT PROMPT
@@ -595,7 +595,7 @@ prompt_kctx() {
   if command -v kubectl > /dev/null 2>&1; then
     if [[ -f $BULLETTRAIN_KCTX_KCONFIG ]]; then
       prompt_segment $BULLETTRAIN_KCTX_BG $BULLETTRAIN_KCTX_FG $BULLETTRAIN_KCTX_PREFIX" $(cat $BULLETTRAIN_KCTX_KCONFIG|grep current-context| awk '{print $2}')"
-    fi  
+    fi
   fi
 }
 

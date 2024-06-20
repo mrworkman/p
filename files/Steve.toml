@@ -1,27 +1,27 @@
 [colors]
 
 ansi = [
-    "#eeeeee",
+    "#2f3335",
     "#ba2619",
     "#5d882e",
     "#db7e31",
     "#275d83",
     "#6f5178",
     "#3a8485",
-    "#2f3335",
+    "#eeeeee",
 ]
 
 background = "#eeeeee"
 
 brights = [
-    "#feffff",
+    "#758186",
     "#db3f35",
     "#7db341",
     "#ef8a37",
     "#3a84ab",
     "#a680a5",
     "#4eadae",
-    "#758186",
+    "#feffff",
 ]
 
 cursor_bg = "#2f3335"
