@@ -363,6 +363,7 @@ dirs=(
    .tmux
    .tmux/plugins
    .tmux/plugins/maglev
+   .config/wezterm/colors
    .zshrc.d
 )
 
