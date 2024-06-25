@@ -43,3 +43,16 @@ if [[ ! $path =~ ${local_bin//\./\\.} ]]; then
 fi
 
 unset local_bin
+
+# Enable additional ZSH completions.
+if type brew &>/dev/null; then
+   BREW_PATH=$(brew --prefix)
+   FPATH=$BREW_PATH/share/zsh-completions:$FPATH
+   FPATH=$BREW_PATH/share/zsh/site-functions:$FPATH
+
+   chmod go-w /opt/homebrew/share
+   chmod -R go-w /opt/homebrew/share/zsh
+
+   autoload -Uz compinit
+   rm -f ~/.zcompdump; compinit
+fi
