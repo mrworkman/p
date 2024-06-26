@@ -245,6 +245,10 @@ function configure_ssh {
       printf "GitHub SSH key exists for '$user'.\n"
    fi
 
+   if [[ -e $user_dir/.ssh/config ]]; then
+      cp $user_dir/.ssh/config $user_dir/.ssh/config.bak.$(date +%s)
+   fi
+
    install_file files/ssh-config $user_dir/.ssh/config 0600
 }
 
