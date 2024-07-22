@@ -16,6 +16,7 @@ set expandtab
 set cindent
 set hlsearch
 set nu
+set paste
 
 syntax on
 
@@ -28,3 +29,9 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_theme='base16'
 hi WarningMsg ctermbg=0
+
+" Remember last position when editing a file.
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif

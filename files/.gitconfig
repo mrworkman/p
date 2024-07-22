@@ -3,8 +3,10 @@
    gas  = log --graph --pretty=format':%C(bold yellow)%h%C(blue)%d%C(reset) - %<|(100,trunc)%C(bold black)%s%C(reset) %C(dim black)%an, %C(reset)%C(dim red)%ar%Creset' --all --simplify-by-decoration
 
 [core]
+	editor = vim -f
    excludesfile = /home/{user}/.gitignore_global
 
 [user]
    name = Stephen Workman
    email = workman.stephen@gmail.com
+
