@@ -11,7 +11,11 @@ config.default_prog = { "zsh", "-ilc", "exec tmux" }
 -- config.color_scheme = 'PaperColor Light (base16)'
 config.color_scheme = "Steve"
 
-config.font = wezterm.font("Fira Code", { weight = "Medium" })
+config.font = wezterm.font{
+   family = "Fira Code", 
+   weight = "Medium",
+   harfbuzz_features = { "calt=0", "clig=0", "liga=0" },
+}
 config.font_size = 14
 config.enable_tab_bar = false
 
