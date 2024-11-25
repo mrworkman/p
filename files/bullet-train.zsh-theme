@@ -126,7 +126,7 @@ if [ ! -n "${BULLETTRAIN_AWS_FG+1}" ]; then
   BULLETTRAIN_AWS_FG=white
 fi
 if [ ! -n "${BULLETTRAIN_AWS_PREFIX+1}" ]; then
-  BULLETTRAIN_AWS_PREFIX="☁️"
+  BULLETTRAIN_AWS_PREFIX=""
 fi
 
 # AWS VAULT
