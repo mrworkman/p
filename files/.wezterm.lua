@@ -5,7 +5,13 @@ local act = wezterm.action
 -- This will hold the configuration.
 local config = wezterm.config_builder()
 
-config.default_prog = { "zsh", "-ilc", "exec tmux" }
+config.default_prog = { 
+   "bash", 
+   "--noprofile", 
+   "--norc",
+   "-c", 
+   "PATH=/opt/homebrew/bin:$PATH tmux" 
+}
 
 -- This is where you actually apply your config choices
 -- config.color_scheme = 'PaperColor Light (base16)'
