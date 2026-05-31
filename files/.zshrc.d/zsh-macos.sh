@@ -56,3 +56,6 @@ if type brew &>/dev/null; then
    autoload -Uz compinit
    rm -f ~/.zcompdump; compinit
 fi
+
+alias cat=bat
+alias grep='rg -uu'
